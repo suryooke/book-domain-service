@@ -10,11 +10,14 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import com.oyo.book.model.Greeting;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class MessageProducerImpl implements MessageProducer{
 	
 	@Autowired
-	private KafkaTemplate<String, String> kafkaTemplate;
+	private KafkaTemplate<String, Greeting> kafkaTemplate;
 	
 	@Autowired
 	private KafkaTemplate<String, Greeting> greetingKafkaTemplate;
@@ -31,14 +34,14 @@ public class MessageProducerImpl implements MessageProducer{
     @Value(value = "${greeting.topic.name}")
     private String greetingTopicName;
 
-    public void sendMessage(String message) {
+    public void sendMessage(Greeting message) {
 
-        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topicName, message);
-        System.out.println("Sending message : " + message);
-        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+        ListenableFuture<SendResult<String, Greeting>> future = kafkaTemplate.send(topicName, message);
+        log.info("Sending message : " + message);
+        future.addCallback(new ListenableFutureCallback<SendResult<String, Greeting>>() {
 
             @Override
-            public void onSuccess(SendResult<String, String> result) {
+            public void onSuccess(SendResult<String, Greeting> result) {
                 System.out.println("Sent message=[" + message + "] with offset=[" + result.getRecordMetadata()
                     .offset() + "]");
             }
@@ -50,11 +53,11 @@ public class MessageProducerImpl implements MessageProducer{
         });
     }
     
-    public void sendMessageToPartition(String message, int partition) {
+    public void sendMessageToPartition(Greeting message, int partition) {
         kafkaTemplate.send(partitionedTopicName, partition, null, message);
     }
 
-    public void sendMessageToFiltered(String message) {
+    public void sendMessageToFiltered(Greeting message) {
         kafkaTemplate.send(filteredTopicName, message);
     }
 

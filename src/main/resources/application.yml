@@ -1,5 +1,22 @@
+server:
+  port: 8091
+  
+spring:
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      bindings:
+        greet-in:
+          destination: baeldung
+          contentType: application/json
+        greet-out:
+          destination: baeldung
+          contentType: application/json
+
 kafka:
-    bootstrapAddress: cicdserver:9092
+    bootstrapAddress: localhost:9092
 message:
     topic:
         name: baeldung
